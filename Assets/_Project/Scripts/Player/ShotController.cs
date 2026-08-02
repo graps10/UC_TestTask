@@ -12,22 +12,33 @@ namespace Game.Player
         [Tooltip("Shot size gained per second the tap is held; the player shrinks by the same amount.")]
         [SerializeField] private float growthRate = 1.0f;
 
+        [Tooltip("Caps the deltaTime used for charge growth, so a single hitched/stalled frame " +
+                 "(e.g. right after a heavy scene load) can't instantly dump a huge chunk of growth.")]
+        [SerializeField] private float maxChargeDeltaTime = 0.05f;
+
         private PlayerBall _player;
         private ObstacleField _obstacles;
         private Transform _aimTarget;
         private BalanceSettings _balance;
+        private Shot _shotPrefab;
 
         private Shot _activeShot;
         private float _chargeStartSize;
         private float _currentShotSize;
         private bool _charging;
 
-        public void Initialize(PlayerBall player, ObstacleField obstacles, Transform aimTarget, BalanceSettings balance)
+        public void Initialize(
+            PlayerBall player,
+            ObstacleField obstacles,
+            Transform aimTarget,
+            BalanceSettings balance,
+            Shot shotPrefab)
         {
             _player = player;
             _obstacles = obstacles;
             _aimTarget = aimTarget;
             _balance = balance;
+            _shotPrefab = shotPrefab;
         }
 
         private void Update()
@@ -35,16 +46,18 @@ namespace Game.Player
             var pointer = Pointer.current;
             if (pointer == null)
                 return;
-
+            
             if (!_charging && pointer.press.wasPressedThisFrame)
             {
                 BeginCharge();
             }
-            else if (_charging && pointer.press.isPressed)
+
+            if (_charging && pointer.press.isPressed)
             {
                 ContinueCharge();
             }
-            else if (_charging && pointer.press.wasReleasedThisFrame)
+
+            if (_charging && pointer.press.wasReleasedThisFrame)
             {
                 ReleaseShot();
             }
@@ -62,16 +75,14 @@ namespace Game.Player
 
         private void ContinueCharge()
         {
-            _currentShotSize += growthRate * Time.deltaTime;
+            float dt = Mathf.Min(Time.deltaTime, maxChargeDeltaTime);
+            _currentShotSize += growthRate * dt;
             float remaining = _chargeStartSize - _currentShotSize;
 
             _player.SetSize(remaining);
 
             if (remaining <= _balance.CriticalMinSize)
             {
-                // Over-held past the critical threshold: PlayerBall already raised
-                // OnCriticalSizeReached from SetSize above. Freeze the charge in place
-                // rather than launching it — GameManager will take over from here.
                 _charging = false;
                 return;
             }
@@ -97,8 +108,7 @@ namespace Game.Player
 
         private Shot SpawnShot()
         {
-            var go = new GameObject("Shot");
-            return go.AddComponent<Shot>();
+            return Instantiate(_shotPrefab);
         }
     }
 }

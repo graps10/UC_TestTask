@@ -45,6 +45,9 @@ namespace Game.Tests
             var playerGo = new GameObject("Player");
             playerGo.transform.SetParent(_root.transform);
             var player = playerGo.AddComponent<PlayerBall>();
+            var playerVisual = new GameObject("Visual").transform;
+            playerVisual.SetParent(playerGo.transform);
+            player.SetVisualForTest(playerVisual);
 
             var shotControllerGo = new GameObject("ShotController");
             shotControllerGo.transform.SetParent(_root.transform);
@@ -53,7 +56,12 @@ namespace Game.Tests
             var doorGo = new GameObject("Door");
             doorGo.transform.SetParent(_root.transform);
             var door = doorGo.AddComponent<Door>();
-            door.Initialize(new Vector3(0f, 0f, 10f), 6f, player.transform);
+            var leftPanel = new GameObject("LeftPanel").transform;
+            leftPanel.SetParent(doorGo.transform);
+            var rightPanel = new GameObject("RightPanel").transform;
+            rightPanel.SetParent(doorGo.transform);
+            door.SetPanelsForTest(leftPanel, rightPanel);
+            door.Initialize(new Vector3(0f, 0f, 10f), player.transform);
 
             var managerGo = new GameObject("GameManager");
             managerGo.transform.SetParent(_root.transform);

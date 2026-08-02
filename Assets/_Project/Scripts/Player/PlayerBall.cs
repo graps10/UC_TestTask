@@ -1,7 +1,6 @@
 using System;
 using Game.Core;
 using Game.Obstacles;
-using Game.Shared;
 using UnityEngine;
 
 namespace Game.Player
@@ -9,6 +8,9 @@ namespace Game.Player
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class PlayerBall : MonoBehaviour
     {
+        [Tooltip("Visual sphere child (hand-authored in the Player prefab).")]
+        [SerializeField] private Transform visual;
+
         [Tooltip("Constant forward movement speed along the corridor, in units/second.")]
         [SerializeField] private float forwardSpeed = 2f;
 
@@ -17,9 +19,6 @@ namespace Game.Player
 
         [Tooltip("Vertical bob speed while moving.")]
         [SerializeField] private float hopFrequency = 4f;
-
-        [Tooltip("Player ball color.")]
-        [SerializeField] private Color ballColor = new Color(0.95f, 0.9f, 0.8f);
 
         [Tooltip("Shrinks the forward-blocking check slightly below the ball's actual " +
                  "radius so it doesn't snag on obstacles that only just graze its edge.")]
@@ -30,7 +29,6 @@ namespace Game.Player
 
         private Rigidbody _rb;
         private SphereCollider _collider;
-        private Transform _visual;
         private float _criticalMinSize;
         private bool _criticalFired;
         private bool _canMove = true;
@@ -60,19 +58,22 @@ namespace Game.Player
             _rb.useGravity = false;
 
             _collider = GetComponent<SphereCollider>();
-
-            _visual = BuildVisual();
         }
 
         public void SetCanMove(bool canMove)
         {
             _canMove = canMove;
         }
+        
+        public void SetVisualForTest(Transform visualRef)
+        {
+            visual = visualRef;
+        }
 
         public void SetSize(float newSize)
         {
             CurrentSize = Mathf.Max(0f, newSize);
-            _visual.localScale = Vector3.one * CurrentSize;
+            visual.localScale = Vector3.one * CurrentSize;
             _collider.radius = CurrentSize * 0.5f;
 
             if (!_criticalFired && CurrentSize <= _criticalMinSize)
@@ -97,7 +98,7 @@ namespace Game.Player
         private void Update()
         {
             float bob = Mathf.Abs(Mathf.Sin(Time.time * hopFrequency)) * hopHeight;
-            _visual.localPosition = new Vector3(0f, bob, 0f);
+            visual.localPosition = new Vector3(0f, CurrentSize * 0.5f + bob, 0f);
         }
 
         private bool IsBlockedAhead(Vector3 targetPos)
@@ -111,11 +112,6 @@ namespace Game.Player
                     return true;
             }
             return false;
-        }
-
-        private Transform BuildVisual()
-        {
-            return RuntimePrimitives.CreateVisualSphere("Visual", transform, RuntimeMaterials.GetOrCreate(ballColor));
         }
     }
 }

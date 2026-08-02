@@ -91,5 +91,36 @@ namespace Game.Tests
                 }
             }
         }
+        
+        [Test]
+        public void NoRowHasAGapWiderThanMaxGapFactor()
+        {
+            for (int seed = 0; seed < 20; seed++)
+            {
+                var settings = DefaultSettings();
+                settings.Seed = seed;
+                var layout = LevelGenerator.Generate(settings);
+
+                float halfWidth = settings.CorridorWidth * 0.5f;
+                float edgeMargin = settings.ObstacleRadius * settings.EdgeMarginFactor;
+                float placeMin = -halfWidth + edgeMargin;
+                float placeMax = halfWidth - edgeMargin;
+                float maxAllowedGap = settings.ObstacleRadius * settings.MaxGapFactor;
+
+                foreach (var row in layout.Rows)
+                {
+                    var sortedX = row.ObstacleX.OrderBy(x => x).ToList();
+                    float prev = placeMin;
+                    foreach (var x in sortedX)
+                    {
+                        Assert.LessOrEqual(x - prev, maxAllowedGap + 0.0001f,
+                            $"Seed {seed}, row z={row.Z}: gap before x={x} is walkable.");
+                        prev = x;
+                    }
+                    Assert.LessOrEqual(placeMax - prev, maxAllowedGap + 0.0001f,
+                        $"Seed {seed}, row z={row.Z}: trailing gap to the corridor wall is walkable.");
+                }
+            }
+        }
     }
 }

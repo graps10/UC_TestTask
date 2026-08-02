@@ -1,52 +1,43 @@
 using System;
 using DG.Tweening;
 using Game.Player;
-using Game.Shared;
 using UnityEngine;
 
 namespace Game.Level
 {
+    [RequireComponent(typeof(BoxCollider))]
     public class Door : MonoBehaviour
     {
+        [Tooltip("Left door panel (hand-authored in the Door prefab, positioned as 'closed').")]
+        [SerializeField] private Transform leftPanel;
+
+        [Tooltip("Right door panel (hand-authored in the Door prefab, positioned as 'closed').")]
+        [SerializeField] private Transform rightPanel;
+
         [Tooltip("Distance from the player at which the door starts opening, in world units (spec: 5m).")]
         [SerializeField] private float openDistance = 5f;
 
         [Tooltip("How long the opening slide animation takes, in seconds.")]
         [SerializeField] private float openDuration = 0.5f;
 
-        [Tooltip("Width of each door panel, in units.")]
-        [SerializeField] private float panelWidth = 1.5f;
-
-        [Tooltip("Height of each door panel, in units.")]
-        [SerializeField] private float panelHeight = 2.5f;
-
-        [Tooltip("Thickness of each door panel, in units.")]
-        [SerializeField] private float panelDepth = 0.3f;
-
-        [Tooltip("Door color.")]
-        [SerializeField] private Color doorColor = new Color(0.9f, 0.75f, 0.2f);
-
-        [Tooltip("How far (in panel widths) each panel slides out when opening.")]
-        [SerializeField] private float openSlideMultiplier = 1.5f;
-
-        [Tooltip("Z-thickness of the win trigger volume in front of the door.")]
-        [SerializeField] private float triggerDepth = 2f;
+        [Tooltip("How far each panel slides out from its authored 'closed' position when opening, in units.")]
+        [SerializeField] private float openSlideDistance = 2f;
 
         public event Action OnPlayerEntered;
 
         private Transform _player;
-        private Transform _leftPanel;
-        private Transform _rightPanel;
+        private float _leftClosedX;
+        private float _rightClosedX;
         private bool _opened;
         private bool _entered;
 
-        public void Initialize(Vector3 position, float corridorWidth, Transform player)
+        public void Initialize(Vector3 position, Transform player)
         {
             transform.position = position;
             _player = player;
 
-            BuildVisual();
-            BuildTrigger(corridorWidth);
+            _leftClosedX = leftPanel.localPosition.x;
+            _rightClosedX = rightPanel.localPosition.x;
         }
 
         private void Update()
@@ -61,8 +52,8 @@ namespace Game.Level
         private void Open()
         {
             _opened = true;
-            _leftPanel.DOLocalMoveX(-panelWidth * openSlideMultiplier, openDuration).SetEase(Ease.OutQuad);
-            _rightPanel.DOLocalMoveX(panelWidth * openSlideMultiplier, openDuration).SetEase(Ease.OutQuad);
+            leftPanel.DOLocalMoveX(_leftClosedX - openSlideDistance, openDuration).SetEase(Ease.OutQuad);
+            rightPanel.DOLocalMoveX(_rightClosedX + openSlideDistance, openDuration).SetEase(Ease.OutQuad);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -79,26 +70,11 @@ namespace Game.Level
             _entered = true;
             OnPlayerEntered?.Invoke();
         }
-
-        private void BuildVisual()
+        
+        public void SetPanelsForTest(Transform leftPanelRef, Transform rightPanelRef)
         {
-            var material = RuntimeMaterials.GetOrCreate(doorColor);
-
-            _leftPanel = RuntimePrimitives.CreateVisualCube("LeftPanel", transform, material);
-            _leftPanel.localScale = new Vector3(panelWidth, panelHeight, panelDepth);
-            _leftPanel.localPosition = new Vector3(-panelWidth * 0.5f, panelHeight * 0.5f, 0f);
-
-            _rightPanel = RuntimePrimitives.CreateVisualCube("RightPanel", transform, material);
-            _rightPanel.localScale = new Vector3(panelWidth, panelHeight, panelDepth);
-            _rightPanel.localPosition = new Vector3(panelWidth * 0.5f, panelHeight * 0.5f, 0f);
-        }
-
-        private void BuildTrigger(float corridorWidth)
-        {
-            var trigger = gameObject.AddComponent<BoxCollider>();
-            trigger.isTrigger = true;
-            trigger.size = new Vector3(corridorWidth, panelHeight * 2f, triggerDepth);
-            trigger.center = new Vector3(0f, panelHeight, 0f);
+            leftPanel = leftPanelRef;
+            rightPanel = rightPanelRef;
         }
     }
 }

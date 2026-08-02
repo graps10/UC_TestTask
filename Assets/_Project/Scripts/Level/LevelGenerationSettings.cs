@@ -12,7 +12,9 @@ namespace Game.Level
         [Tooltip("Width of the playable corridor, in units.")]
         public float CorridorWidth = 6f;
 
-        [Tooltip("Radius of a single obstacle, in units.")]
+        [Tooltip("Radius of a single obstacle, in units. In-game, GameBootstrap overwrites this " +
+                 "from the Obstacle prefab's own CapsuleCollider at startup — editing it here only " +
+                 "matters for calling LevelGenerator/LevelSolver directly (e.g. from tests).")]
         public float ObstacleRadius = 0.5f;
 
         [Tooltip("Player's spawn Z position.")]
@@ -55,5 +57,13 @@ namespace Game.Level
 
         [Tooltip("Keeps obstacles from spawning flush against the corridor walls, as a multiple of ObstacleRadius.")]
         public float EdgeMarginFactor = 1.2f;
+
+        [Tooltip("Maximum natural gap allowed between neighbouring obstacles (or a corridor wall) in a " +
+                 "row, as a multiple of ObstacleRadius — a filler obstacle is inserted into any larger " +
+                 "gap. Prevents a row from ever being freely walkable, which would otherwise let " +
+                 "LevelSolver find a degenerate 'shrink to a tiny ball and sneak through unshot' " +
+                 "solution instead of a real one. Keep this comfortably below SparseMinSpacingFactor " +
+                 "or it'll fight the sparse-row spacing and pack every row solid.")]
+        public float MaxGapFactor = 2.5f;
     }
 }

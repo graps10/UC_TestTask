@@ -10,18 +10,34 @@ namespace Game.Tests
     public class ObstacleFieldTests
     {
         private GameObject _root;
+        private GameObject _obstaclePrefabGo;
 
         [TearDown]
         public void TearDown()
         {
             if (_root != null)
                 Object.DestroyImmediate(_root);
+            if (_obstaclePrefabGo != null)
+                Object.DestroyImmediate(_obstaclePrefabGo);
         }
 
         private ObstacleField CreateField()
         {
             _root = new GameObject("ObstacleFieldTestRoot");
             return _root.AddComponent<ObstacleField>();
+        }
+        
+        private Obstacle CreateObstaclePrefab()
+        {
+            _obstaclePrefabGo = new GameObject("ObstaclePrefabTemplate");
+            _obstaclePrefabGo.AddComponent<CapsuleCollider>();
+            var obstacle = _obstaclePrefabGo.AddComponent<Obstacle>();
+
+            var visual = new GameObject("Visual").transform;
+            visual.SetParent(_obstaclePrefabGo.transform);
+            obstacle.SetVisualForTest(visual);
+
+            return obstacle;
         }
 
         // Index 0 = x:-1, index 1 = x:-0.7 (close to 0), index 2 = x:2 (far/isolated).
@@ -59,7 +75,7 @@ namespace Game.Tests
         public void Initialize_SpawnsOneObstaclePerLayoutEntry()
         {
             var field = CreateField();
-            field.Initialize(BuildSimpleLayout(), BuildBalance());
+            field.Initialize(BuildSimpleLayout(), BuildBalance(), CreateObstaclePrefab());
 
             Assert.AreEqual(3, ObstaclesByIndex(_root).Count);
         }
@@ -68,7 +84,7 @@ namespace Game.Tests
         public void Explode_DestroysImpactAndCloseNeighbour_ButNotFarObstacle()
         {
             var field = CreateField();
-            field.Initialize(BuildSimpleLayout(), BuildBalance());
+            field.Initialize(BuildSimpleLayout(), BuildBalance(), CreateObstaclePrefab());
             var obstacles = ObstaclesByIndex(_root);
 
             field.Explode(impactIndex: 0, shotSize: 0f);
@@ -82,7 +98,7 @@ namespace Game.Tests
         public void Explode_DisablesColliderImmediately()
         {
             var field = CreateField();
-            field.Initialize(BuildSimpleLayout(), BuildBalance());
+            field.Initialize(BuildSimpleLayout(), BuildBalance(), CreateObstaclePrefab());
             var obstacles = ObstaclesByIndex(_root);
 
             field.Explode(impactIndex: 0, shotSize: 0f);
@@ -94,7 +110,7 @@ namespace Game.Tests
         public void Explode_OnAlreadyDeadImpact_IsNoOpAndDoesNotThrow()
         {
             var field = CreateField();
-            field.Initialize(BuildSimpleLayout(), BuildBalance());
+            field.Initialize(BuildSimpleLayout(), BuildBalance(), CreateObstaclePrefab());
             var obstacles = ObstaclesByIndex(_root);
 
             field.Explode(impactIndex: 0, shotSize: 0f);

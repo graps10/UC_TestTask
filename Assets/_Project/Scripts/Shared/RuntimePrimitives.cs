@@ -16,6 +16,11 @@ namespace Game.Shared
             return CreateVisual(name, parent, material, "Cube.fbx");
         }
 
+        public static Transform CreateVisualCapsule(string name, Transform parent, Material material)
+        {
+            return CreateVisual(name, parent, material, "Capsule.fbx");
+        }
+
         private static Transform CreateVisual(string name, Transform parent, Material material, string builtinMeshName)
         {
             var go = new GameObject(name);

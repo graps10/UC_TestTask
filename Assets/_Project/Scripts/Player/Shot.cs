@@ -1,6 +1,5 @@
 using System;
 using Game.Obstacles;
-using Game.Shared;
 using UnityEngine;
 
 namespace Game.Player
@@ -10,19 +9,18 @@ namespace Game.Player
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class Shot : MonoBehaviour
     {
+        [Tooltip("Visual sphere child (hand-authored in the Shot prefab).")]
+        [SerializeField] private Transform visual;
+
         [Tooltip("Speed the shot travels at once launched, in units/second.")]
         [SerializeField] private float flightSpeed = 15f;
 
         [Tooltip("Safety cleanup: seconds after launch before the shot destroys itself if it hasn't hit anything.")]
         [SerializeField] private float maxLifetime = 5f;
 
-        [Tooltip("Shot color.")]
-        [SerializeField] private Color shotColor = new Color(0.95f, 0.6f, 0.15f);
-
         [Tooltip("Keeps the shot visible even at size 0 right at the start of a charge.")]
         [SerializeField] private float minVisualSize = 0.05f;
 
-        private Transform _visual;
         private SphereCollider _collider;
 
         private float _size;
@@ -63,7 +61,6 @@ namespace Game.Player
             _collider = GetComponent<SphereCollider>();
             _collider.isTrigger = true;
 
-            _visual = BuildVisual();
             SetVisualSize(0f);
         }
 
@@ -99,15 +96,12 @@ namespace Game.Player
             _onHitObstacle?.Invoke(obstacle.Index, _size);
             Destroy(gameObject);
         }
-
+        
         private void SetVisualSize(float size)
         {
-            _visual.localScale = Vector3.one * Mathf.Max(size, minVisualSize);
-        }
-
-        private Transform BuildVisual()
-        {
-            return RuntimePrimitives.CreateVisualSphere("Visual", transform, RuntimeMaterials.GetOrCreate(shotColor));
+            float clamped = Mathf.Max(size, minVisualSize);
+            visual.localScale = Vector3.one * clamped;
+            visual.localPosition = new Vector3(0f, clamped * 0.5f, 0f);
         }
     }
 }

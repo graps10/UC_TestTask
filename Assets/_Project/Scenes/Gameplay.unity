@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,21 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82f53d06fbd0f4a448356b3720ac634c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.CameraControl.FollowCamera
+  offset: {x: 0, y: 6, z: -5}
+  followSpeed: 4
+  fixedEulerAngles: {x: 50, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,6 +399,83 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &466754334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 466754336}
+  - component: {fileID: 466754335}
+  m_Layer: 0
+  m_Name: GameBootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &466754335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466754334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbff37f096d3eee42bbcc60548df3c96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.Core.GameBootstrap
+  levelSettings:
+    Seed: 12345
+    CorridorWidth: 6
+    ObstacleRadius: 0.5
+    StartClearZ: 0
+    FirstRowZ: 4
+    RowSpacing: 3
+    RowCount: 12
+    DoorApproachClearance: 3
+    MinObstaclesPerRow: 3
+    MaxObstaclesPerRow: 7
+    DenseRowChance: 0.5
+    DenseMinSpacingFactor: 1.6
+    SparseMinSpacingFactor: 4
+    DenseCountReduction: 2
+    SparseCountBonus: 2
+    EdgeMarginFactor: 1.2
+  balance:
+    BaseBlastRadius: 0.3
+    RadiusPerSize: 1
+    ChainRadius: 1.5
+    CriticalMinSize: 0.4
+    GapClearanceFactor: 1.15
+  groundWidthMargin: 5
+  groundLengthMargin: 6
+  groundThickness: 0.2
+  playerPrefab: {fileID: 4490234767058918606, guid: f2801a8d0ced2b54ca406a1fc91cc6be, type: 3}
+  obstaclePrefab: {fileID: 3937812057021491575, guid: b51f6ce0fc0536f47a3b60eb869b2478, type: 3}
+  doorPrefab: {fileID: 8583170024659477063, guid: 500afc8ba5b6d1649b4731df5f3c3a5a, type: 3}
+  shotPrefab: {fileID: 7477453035945328331, guid: 129fe54525053e84e849198290888de1, type: 3}
+  groundPrefab: {fileID: 539097763740331520, guid: aaca7799527d557438debc45cd56328d, type: 3}
+  uiManager: {fileID: 7627494341608258352}
+  followCamera: {fileID: 330585548}
+--- !u!4 &466754336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466754334}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &488346103
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,6 +701,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dc73d8ab9a8831489c048db02f8bc8d, type: 3}
+--- !u!114 &7627494341608258352 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2680673034951475768, guid: 7dc73d8ab9a8831489c048db02f8bc8d, type: 3}
+  m_PrefabInstance: {fileID: 7627494341608258351}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d6b8ea2fc7dfc449adce8a2a1cfc666, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.UI.UIManager
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -615,5 +719,6 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 7627494341608258351}
   - {fileID: 488346106}
+  - {fileID: 7627494341608258351}
+  - {fileID: 466754336}

@@ -80,6 +80,13 @@ namespace Game.UI
 
         private void OnDestroy()
         {
+            if (hintGroup != null)
+                DOTween.Kill(hintGroup);
+            if (winPanelContent != null)
+                DOTween.Kill(winPanelContent);
+            if (losePanelContent != null)
+                DOTween.Kill(losePanelContent);
+
             if (_gameManager == null)
                 return;
             _gameManager.OnWin -= ShowWinPanel;

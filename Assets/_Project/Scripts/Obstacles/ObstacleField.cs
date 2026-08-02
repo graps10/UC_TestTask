@@ -1,19 +1,12 @@
 using System.Collections.Generic;
 using Game.Core;
 using Game.Level;
-using Game.Shared;
 using UnityEngine;
 
 namespace Game.Obstacles
 {
     public class ObstacleField : MonoBehaviour
     {
-        [Tooltip("Visual height of each obstacle capsule, in units.")]
-        [SerializeField] private float capsuleHeight = 1.4f;
-
-        [Tooltip("Obstacle color.")]
-        [SerializeField] private Color obstacleColor = new Color(0.2f, 0.55f, 0.2f);
-
         [Tooltip("Seconds of Kill() delay per world unit of distance from the impact point, " +
                  "so a chain reaction visibly ripples outward instead of popping all at once.")]
         [SerializeField] private float rippleDelayPerUnit = 0.03f;
@@ -23,10 +16,12 @@ namespace Game.Obstacles
         private readonly List<bool> _alive = new List<bool>();
 
         private BalanceSettings _balance;
+        private Obstacle _obstaclePrefab;
 
-        public void Initialize(LevelLayout layout, BalanceSettings balance)
+        public void Initialize(LevelLayout layout, BalanceSettings balance, Obstacle obstaclePrefab)
         {
             _balance = balance;
+            _obstaclePrefab = obstaclePrefab;
 
             foreach (var row in layout.Rows)
             {
@@ -56,14 +51,9 @@ namespace Game.Obstacles
 
         private void SpawnObstacle(Vector3 position, float radius)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            go.name = $"Obstacle_{_obstacles.Count}";
-            go.transform.SetParent(transform, false);
-            go.transform.position = position;
-            go.transform.localScale = new Vector3(radius * 2f, capsuleHeight * 0.5f, radius * 2f);
-            go.GetComponent<MeshRenderer>().sharedMaterial = RuntimeMaterials.GetOrCreate(obstacleColor);
-
-            var obstacle = go.AddComponent<Obstacle>();
+            var obstacle = Instantiate(_obstaclePrefab, position, Quaternion.identity, transform);
+            obstacle.name = $"Obstacle_{_obstacles.Count}";
+            obstacle.ConfigureRadius(radius);
             obstacle.Initialize(_obstacles.Count);
 
             _obstacles.Add(obstacle);

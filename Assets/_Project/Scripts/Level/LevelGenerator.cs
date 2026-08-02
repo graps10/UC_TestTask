@@ -5,6 +5,7 @@ namespace Game.Level
     public static class LevelGenerator
     {
         private const int MaxPlacementAttemptsPerObstacle = 30;
+        private const int MaxGapClosePasses = 40;
 
         public static LevelLayout Generate(LevelGenerationSettings settings)
         {
@@ -72,7 +73,49 @@ namespace Game.Level
                 }
             }
 
+            CloseOversizedGaps(row, settings, placeMin, placeMax);
+
             return row;
+        }
+        
+        private static void CloseOversizedGaps(LevelRow row, LevelGenerationSettings settings, float placeMin, float placeMax)
+        {
+            float maxGap = settings.ObstacleRadius * settings.MaxGapFactor;
+
+            for (int pass = 0; pass < MaxGapClosePasses; pass++)
+            {
+                row.ObstacleX.Sort();
+
+                float worstGapStart = placeMin;
+                float worstGapEnd = placeMin;
+                float worstGapSize = -1f;
+                float prev = placeMin;
+
+                foreach (var x in row.ObstacleX)
+                {
+                    float gap = x - prev;
+                    if (gap > worstGapSize)
+                    {
+                        worstGapSize = gap;
+                        worstGapStart = prev;
+                        worstGapEnd = x;
+                    }
+                    prev = x;
+                }
+
+                float tailGap = placeMax - prev;
+                if (tailGap > worstGapSize)
+                {
+                    worstGapSize = tailGap;
+                    worstGapStart = prev;
+                    worstGapEnd = placeMax;
+                }
+
+                if (worstGapSize <= maxGap)
+                    return;
+
+                row.ObstacleX.Add((worstGapStart + worstGapEnd) * 0.5f);
+            }
         }
 
         private static bool IsFarEnoughFromExisting(LevelRow row, float x, float minSpacing)

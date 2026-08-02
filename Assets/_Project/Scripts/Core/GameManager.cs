@@ -45,7 +45,12 @@ namespace Game.Core
                                   "range; falling back to the physical ceiling as a best effort.");
             }
 
-            _player.Initialize(minRequiredSize * startSizeBuffer, balance);
+            float startSize = minRequiredSize * startSizeBuffer;
+            _player.Initialize(startSize, balance);
+
+            // TEMP diagnostic for the "one tap instantly drains everything" report — remove once resolved.
+            Debug.Log($"[GameManager] startSize={startSize:F2} (minRequired={minRequiredSize:F2}, " +
+                      $"criticalMinSize={balance.CriticalMinSize:F2}, usable budget={startSize - balance.CriticalMinSize:F2})");
 
             _player.OnCriticalSizeReached += HandleLose;
             _door.OnPlayerEntered += HandleWin;

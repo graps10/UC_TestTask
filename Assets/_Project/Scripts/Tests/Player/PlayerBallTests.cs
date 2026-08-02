@@ -19,7 +19,11 @@ namespace Game.Tests
         private PlayerBall CreatePlayer()
         {
             _go = new GameObject("PlayerBallTest");
-            return _go.AddComponent<PlayerBall>();
+            var player = _go.AddComponent<PlayerBall>();
+            var visual = new GameObject("Visual").transform;
+            visual.SetParent(_go.transform);
+            player.SetVisualForTest(visual);
+            return player;
         }
 
         private static BalanceSettings BuildBalance()

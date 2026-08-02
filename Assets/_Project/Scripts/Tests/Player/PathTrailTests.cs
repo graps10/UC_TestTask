@@ -23,6 +23,9 @@ namespace Game.Tests
             var playerGo = new GameObject("Player");
             playerGo.transform.SetParent(_root.transform);
             var player = playerGo.AddComponent<PlayerBall>();
+            var playerVisual = new GameObject("Visual").transform;
+            playerVisual.SetParent(playerGo.transform);
+            player.SetVisualForTest(playerVisual);
             player.Initialize(2f, new BalanceSettings { CriticalMinSize = 0.4f });
 
             var trailGo = new GameObject("PathTrail");
