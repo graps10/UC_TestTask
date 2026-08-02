@@ -1,11 +1,8 @@
 {
-    "name": "Game.Runtime",
-    "rootNamespace": "Game",
+    "name": "Demigiant.DOTween.Modules",
+    "rootNamespace": "",
     "references": [
-        "Unity.InputSystem",
-        "Unity.TextMeshPro",
-        "UnityEngine.UI",
-        "Demigiant.DOTween.Modules"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
