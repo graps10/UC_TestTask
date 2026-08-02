@@ -9,7 +9,8 @@ namespace Game.Player
     // and drives the PlayerBall/Shot resource transfer while charging
     public class ShotController : MonoBehaviour
     {
-        [SerializeField] private float growthRate = 1.0f; // shot size gained per second held
+        [Tooltip("Shot size gained per second the tap is held; the player shrinks by the same amount.")]
+        [SerializeField] private float growthRate = 1.0f;
 
         private PlayerBall _player;
         private ObstacleField _obstacles;

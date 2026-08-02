@@ -8,11 +8,29 @@ namespace Game.Level
 {
     public class Door : MonoBehaviour
     {
+        [Tooltip("Distance from the player at which the door starts opening, in world units (spec: 5m).")]
         [SerializeField] private float openDistance = 5f;
+
+        [Tooltip("How long the opening slide animation takes, in seconds.")]
         [SerializeField] private float openDuration = 0.5f;
+
+        [Tooltip("Width of each door panel, in units.")]
         [SerializeField] private float panelWidth = 1.5f;
+
+        [Tooltip("Height of each door panel, in units.")]
         [SerializeField] private float panelHeight = 2.5f;
+
+        [Tooltip("Thickness of each door panel, in units.")]
+        [SerializeField] private float panelDepth = 0.3f;
+
+        [Tooltip("Door color.")]
         [SerializeField] private Color doorColor = new Color(0.9f, 0.75f, 0.2f);
+
+        [Tooltip("How far (in panel widths) each panel slides out when opening.")]
+        [SerializeField] private float openSlideMultiplier = 1.5f;
+
+        [Tooltip("Z-thickness of the win trigger volume in front of the door.")]
+        [SerializeField] private float triggerDepth = 2f;
 
         public event Action OnPlayerEntered;
 
@@ -43,8 +61,8 @@ namespace Game.Level
         private void Open()
         {
             _opened = true;
-            _leftPanel.DOLocalMoveX(-panelWidth * 1.5f, openDuration).SetEase(Ease.OutQuad);
-            _rightPanel.DOLocalMoveX(panelWidth * 1.5f, openDuration).SetEase(Ease.OutQuad);
+            _leftPanel.DOLocalMoveX(-panelWidth * openSlideMultiplier, openDuration).SetEase(Ease.OutQuad);
+            _rightPanel.DOLocalMoveX(panelWidth * openSlideMultiplier, openDuration).SetEase(Ease.OutQuad);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -67,11 +85,11 @@ namespace Game.Level
             var material = RuntimeMaterials.GetOrCreate(doorColor);
 
             _leftPanel = RuntimePrimitives.CreateVisualCube("LeftPanel", transform, material);
-            _leftPanel.localScale = new Vector3(panelWidth, panelHeight, 0.3f);
+            _leftPanel.localScale = new Vector3(panelWidth, panelHeight, panelDepth);
             _leftPanel.localPosition = new Vector3(-panelWidth * 0.5f, panelHeight * 0.5f, 0f);
 
             _rightPanel = RuntimePrimitives.CreateVisualCube("RightPanel", transform, material);
-            _rightPanel.localScale = new Vector3(panelWidth, panelHeight, 0.3f);
+            _rightPanel.localScale = new Vector3(panelWidth, panelHeight, panelDepth);
             _rightPanel.localPosition = new Vector3(panelWidth * 0.5f, panelHeight * 0.5f, 0f);
         }
 
@@ -79,7 +97,7 @@ namespace Game.Level
         {
             var trigger = gameObject.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
-            trigger.size = new Vector3(corridorWidth, panelHeight * 2f, 2f);
+            trigger.size = new Vector3(corridorWidth, panelHeight * 2f, triggerDepth);
             trigger.center = new Vector3(0f, panelHeight, 0f);
         }
     }

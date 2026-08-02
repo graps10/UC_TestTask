@@ -6,6 +6,9 @@ namespace Game.Obstacles
     [RequireComponent(typeof(Collider))]
     public class Obstacle : MonoBehaviour
     {
+        [Tooltip("Scale-down animation duration when destroyed, in seconds.")]
+        [SerializeField] private float destroyDuration = 0.2f;
+
         public int Index { get; private set; }
         public bool IsAlive { get; private set; } = true;
 
@@ -25,7 +28,7 @@ namespace Game.Obstacles
             _collider.enabled = false;
 
             transform
-                .DOScale(0f, 0.2f)
+                .DOScale(0f, destroyDuration)
                 .SetDelay(delay)
                 .SetEase(Ease.InBack)
                 .OnComplete(() => Destroy(gameObject));

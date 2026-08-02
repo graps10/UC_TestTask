@@ -15,6 +15,10 @@ namespace Game.Core
     // Owns game state and rules only
     public class GameManager : MonoBehaviour
     {
+        [Tooltip("Safety margin applied on top of LevelSolver's computed minimum, per the spec's " +
+                 "\"must have a 20% buffer from the start\" requirement. 1.2 = +20%.")]
+        [SerializeField] private float startSizeBuffer = 1.2f;
+
         public GameState State { get; private set; } = GameState.Playing;
         public event Action OnWin;
         public event Action OnLose;
@@ -41,7 +45,7 @@ namespace Game.Core
                                   "range; falling back to the physical ceiling as a best effort.");
             }
 
-            _player.Initialize(minRequiredSize * 1.2f, balance);
+            _player.Initialize(minRequiredSize * startSizeBuffer, balance);
 
             _player.OnCriticalSizeReached += HandleLose;
             _door.OnPlayerEntered += HandleWin;

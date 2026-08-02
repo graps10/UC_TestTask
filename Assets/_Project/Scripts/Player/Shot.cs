@@ -10,9 +10,17 @@ namespace Game.Player
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class Shot : MonoBehaviour
     {
+        [Tooltip("Speed the shot travels at once launched, in units/second.")]
         [SerializeField] private float flightSpeed = 15f;
+
+        [Tooltip("Safety cleanup: seconds after launch before the shot destroys itself if it hasn't hit anything.")]
         [SerializeField] private float maxLifetime = 5f;
+
+        [Tooltip("Shot color.")]
         [SerializeField] private Color shotColor = new Color(0.95f, 0.6f, 0.15f);
+
+        [Tooltip("Keeps the shot visible even at size 0 right at the start of a charge.")]
+        [SerializeField] private float minVisualSize = 0.05f;
 
         private Transform _visual;
         private SphereCollider _collider;
@@ -94,7 +102,7 @@ namespace Game.Player
 
         private void SetVisualSize(float size)
         {
-            _visual.localScale = Vector3.one * Mathf.Max(size, 0.05f);
+            _visual.localScale = Vector3.one * Mathf.Max(size, minVisualSize);
         }
 
         private Transform BuildVisual()

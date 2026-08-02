@@ -17,7 +17,7 @@ namespace Game.Level
             };
 
             float halfWidth = settings.CorridorWidth * 0.5f;
-            float edgeMargin = settings.ObstacleRadius * 1.2f;
+            float edgeMargin = settings.ObstacleRadius * settings.EdgeMarginFactor;
             float placeMin = -halfWidth + edgeMargin;
             float placeMax = halfWidth - edgeMargin;
 
@@ -45,16 +45,18 @@ namespace Game.Level
             float placeMax)
         {
             int minCount = dense
-                ? Mathf.Max(settings.MinObstaclesPerRow, settings.MaxObstaclesPerRow - 2)
+                ? Mathf.Max(settings.MinObstaclesPerRow, settings.MaxObstaclesPerRow - settings.DenseCountReduction)
                 : settings.MinObstaclesPerRow;
             int maxCount = dense
                 ? settings.MaxObstaclesPerRow
-                : Mathf.Min(settings.MaxObstaclesPerRow, settings.MinObstaclesPerRow + 2);
+                : Mathf.Min(settings.MaxObstaclesPerRow, settings.MinObstaclesPerRow + settings.SparseCountBonus);
             int count = RandomRange(rng, minCount, maxCount);
 
             // Dense rows allow obstacles to sit almost touching (chain reaction does the
             // rest); sparse rows force real spacing so each obstacle needs its own shot.
-            float minSpacing = dense ? settings.ObstacleRadius * 1.6f : settings.ObstacleRadius * 4f;
+            float minSpacing = dense
+                ? settings.ObstacleRadius * settings.DenseMinSpacingFactor
+                : settings.ObstacleRadius * settings.SparseMinSpacingFactor;
 
             var row = new LevelRow(z);
             for (int o = 0; o < count; o++)

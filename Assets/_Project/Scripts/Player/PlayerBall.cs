@@ -9,10 +9,21 @@ namespace Game.Player
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class PlayerBall : MonoBehaviour
     {
+        [Tooltip("Constant forward movement speed along the corridor, in units/second.")]
         [SerializeField] private float forwardSpeed = 2f;
+
+        [Tooltip("Vertical bob height of the visual sphere while moving, in units.")]
         [SerializeField] private float hopHeight = 0.15f;
+
+        [Tooltip("Vertical bob speed while moving.")]
         [SerializeField] private float hopFrequency = 4f;
+
+        [Tooltip("Player ball color.")]
         [SerializeField] private Color ballColor = new Color(0.95f, 0.9f, 0.8f);
+
+        [Tooltip("Shrinks the forward-blocking check slightly below the ball's actual " +
+                 "radius so it doesn't snag on obstacles that only just graze its edge.")]
+        [SerializeField] private float blockCheckMargin = 0.9f;
 
         public float CurrentSize { get; private set; }
         public event Action OnCriticalSizeReached;
@@ -91,7 +102,7 @@ namespace Game.Player
 
         private bool IsBlockedAhead(Vector3 targetPos)
         {
-            float checkRadius = CurrentSize * 0.5f * 0.9f;
+            float checkRadius = CurrentSize * 0.5f * blockCheckMargin;
             var hits = Physics.OverlapSphere(targetPos, checkRadius);
             foreach (var hit in hits)
             {

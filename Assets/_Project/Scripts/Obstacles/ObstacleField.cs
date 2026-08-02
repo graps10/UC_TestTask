@@ -8,8 +8,15 @@ namespace Game.Obstacles
 {
     public class ObstacleField : MonoBehaviour
     {
+        [Tooltip("Visual height of each obstacle capsule, in units.")]
         [SerializeField] private float capsuleHeight = 1.4f;
+
+        [Tooltip("Obstacle color.")]
         [SerializeField] private Color obstacleColor = new Color(0.2f, 0.55f, 0.2f);
+
+        [Tooltip("Seconds of Kill() delay per world unit of distance from the impact point, " +
+                 "so a chain reaction visibly ripples outward instead of popping all at once.")]
+        [SerializeField] private float rippleDelayPerUnit = 0.03f;
 
         private readonly List<Obstacle> _obstacles = new List<Obstacle>();
         private readonly List<Vector3> _positions = new List<Vector3>();
@@ -39,11 +46,10 @@ namespace Game.Obstacles
             var destroyed = ChainReactionSolver.Simulate(_positions, _alive, impactIndex, blastRadius, _balance.ChainRadius);
 
             Vector3 impactPoint = _positions[impactIndex];
-            const float rippleSpeed = 0.03f; // seconds of delay per world unit from impact
             foreach (var index in destroyed)
             {
                 _alive[index] = false;
-                float delay = Vector3.Distance(_positions[index], impactPoint) * rippleSpeed;
+                float delay = Vector3.Distance(_positions[index], impactPoint) * rippleDelayPerUnit;
                 _obstacles[index].Kill(delay);
             }
         }
