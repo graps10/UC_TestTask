@@ -8,8 +8,6 @@ namespace Game.Gameplay
         [SerializeField] private float capsuleHeight = 1.4f;
         [SerializeField] private Color obstacleColor = new Color(0.2f, 0.55f, 0.2f);
 
-        private static Material _sharedMaterial;
-
         private readonly List<Obstacle> _obstacles = new List<Obstacle>();
         private readonly List<Vector3> _positions = new List<Vector3>();
         private readonly List<bool> _alive = new List<bool>();
@@ -54,7 +52,7 @@ namespace Game.Gameplay
             go.transform.SetParent(transform, false);
             go.transform.position = position;
             go.transform.localScale = new Vector3(radius * 2f, capsuleHeight * 0.5f, radius * 2f);
-            go.GetComponent<MeshRenderer>().sharedMaterial = GetSharedMaterial();
+            go.GetComponent<MeshRenderer>().sharedMaterial = RuntimeMaterials.GetOrCreate(obstacleColor);
 
             var obstacle = go.AddComponent<Obstacle>();
             obstacle.Initialize(_obstacles.Count);
@@ -62,18 +60,6 @@ namespace Game.Gameplay
             _obstacles.Add(obstacle);
             _positions.Add(position);
             _alive.Add(true);
-        }
-
-        private Material GetSharedMaterial()
-        {
-            if (_sharedMaterial == null)
-            {
-                _sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"))
-                {
-                    color = obstacleColor,
-                };
-            }
-            return _sharedMaterial;
         }
     }
 }
