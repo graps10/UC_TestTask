@@ -186,6 +186,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::Game.Player.Shot
   visual: {fileID: 5713191380502651854}
-  flightSpeed: 15
+  flightSpeed: 10
   maxLifetime: 5
-  minVisualSize: 0.05
+  minVisualSize: 0.35

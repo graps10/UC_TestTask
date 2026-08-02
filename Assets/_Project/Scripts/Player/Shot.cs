@@ -18,8 +18,8 @@ namespace Game.Player
         [Tooltip("Safety cleanup: seconds after launch before the shot destroys itself if it hasn't hit anything.")]
         [SerializeField] private float maxLifetime = 5f;
 
-        [Tooltip("Keeps the shot visible even at size 0 right at the start of a charge.")]
-        [SerializeField] private float minVisualSize = 0.05f;
+        [Tooltip("Minimum visible/collider size, so the shot never shrinks to an invisible speck at size 0.")]
+        [SerializeField] private float minVisualSize = 0.35f;
 
         private SphereCollider _collider;
 
@@ -102,6 +102,7 @@ namespace Game.Player
             float clamped = Mathf.Max(size, minVisualSize);
             visual.localScale = Vector3.one * clamped;
             visual.localPosition = new Vector3(0f, clamped * 0.5f, 0f);
+            _collider.radius = clamped * 0.5f;
         }
     }
 }

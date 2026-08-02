@@ -21,14 +21,14 @@ namespace Game.Core
         [Tooltip("Ground plane thickness, in units.")]
         [SerializeField] private float groundThickness = 0.2f;
 
-        [Header("Prefabs (assign in the Inspector)")]
+        [Header("Prefabs")]
         [SerializeField] private PlayerBall playerPrefab;
         [SerializeField] private Obstacle obstaclePrefab;
         [SerializeField] private Door doorPrefab;
         [SerializeField] private Shot shotPrefab;
         [SerializeField] private Transform groundPrefab;
 
-        [Header("Scene references (assign in the Inspector)")]
+        [Header("Scene references")]
         [Tooltip("The hand-authored UIManager_Canvas instance already placed in this scene.")]
         [SerializeField] private UIManager uiManager;
         [Tooltip("FollowCamera component on the scene's Main Camera.")]
@@ -36,8 +36,6 @@ namespace Game.Core
 
         private void Awake()
         {
-            levelSettings.ObstacleRadius = obstaclePrefab.GetComponent<CapsuleCollider>().radius;
-
             var layout = LevelGenerator.Generate(levelSettings);
 
             BuildGround(layout);
@@ -54,7 +52,7 @@ namespace Game.Core
             shotController.Initialize(player, obstacles, door.transform, balance, shotPrefab);
 
             var gameManager = new GameObject("GameManager").AddComponent<GameManager>();
-            gameManager.Initialize(layout, balance, player, shotController, door);
+            gameManager.Initialize(balance, player, shotController, door);
 
             var pathTrail = new GameObject("PathTrail").AddComponent<PathTrail>();
             pathTrail.Initialize(layout.StartZ, player);
@@ -64,6 +62,21 @@ namespace Game.Core
 
             if (uiManager != null)
                 uiManager.Initialize(gameManager, player, balance);
+        }
+        
+        [ContextMenu("Log Player Start Size")]
+        private void LogPlayerStartSize()
+        {
+            float startSize = balance.ApplyStartSizeBuffer
+                ? balance.MinPlayableSize * balance.StartSizeBuffer
+                : balance.MinPlayableSize;
+            string bufferNote = balance.ApplyStartSizeBuffer
+                ? $"minPlayable={balance.MinPlayableSize:F2} x {balance.StartSizeBuffer}"
+                : $"minPlayable={balance.MinPlayableSize:F2}, buffer OFF";
+
+            Debug.Log($"[GameBootstrap] startSize={startSize:F2} ({bufferNote}), " +
+                      $"criticalMinSize={balance.CriticalMinSize:F2}, " +
+                      $"usableBudget={startSize - balance.CriticalMinSize:F2}");
         }
 
         private void BuildGround(LevelLayout layout)

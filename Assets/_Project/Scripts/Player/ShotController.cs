@@ -12,8 +12,7 @@ namespace Game.Player
         [Tooltip("Shot size gained per second the tap is held; the player shrinks by the same amount.")]
         [SerializeField] private float growthRate = 1.0f;
 
-        [Tooltip("Caps the deltaTime used for charge growth, so a single hitched/stalled frame " +
-                 "(e.g. right after a heavy scene load) can't instantly dump a huge chunk of growth.")]
+        [Tooltip("Caps per-frame charge growth so a stalled/hitched frame can't dump a huge jump.")]
         [SerializeField] private float maxChargeDeltaTime = 0.05f;
 
         private PlayerBall _player;
@@ -48,19 +47,13 @@ namespace Game.Player
                 return;
             
             if (!_charging && pointer.press.wasPressedThisFrame)
-            {
                 BeginCharge();
-            }
 
             if (_charging && pointer.press.isPressed)
-            {
                 ContinueCharge();
-            }
 
             if (_charging && pointer.press.wasReleasedThisFrame)
-            {
                 ReleaseShot();
-            }
         }
 
         private void BeginCharge()
@@ -70,7 +63,7 @@ namespace Game.Player
             _currentShotSize = 0f;
 
             _activeShot = SpawnShot();
-            _activeShot.BeginCharge(_player.transform.position);
+            _activeShot.BeginCharge(PlayerVisualPosition());
         }
 
         private void ContinueCharge()
@@ -87,7 +80,24 @@ namespace Game.Player
                 return;
             }
 
-            _activeShot.UpdateCharge(_currentShotSize, _player.transform.position);
+            _activeShot.UpdateCharge(_currentShotSize, PlayerVisualPosition());
+        }
+        
+        private Vector3 PlayerVisualPosition()
+        {
+            return _player.transform.position + Vector3.up * (_player.CurrentSize * 0.5f);
+        }
+
+        // Called on win/lose so a mid-charge shot doesn't hang in the air unresolved.
+        public void CancelCharge()
+        {
+            if (!_charging)
+                return;
+
+            _charging = false;
+            if (_activeShot != null)
+                Destroy(_activeShot.gameObject);
+            _activeShot = null;
         }
 
         private void ReleaseShot()

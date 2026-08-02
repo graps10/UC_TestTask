@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5371726327365128187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1051190448573475237}
+  - component: {fileID: 1514181391312334655}
+  m_Layer: 0
+  m_Name: GameBootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1051190448573475237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5371726327365128187}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1514181391312334655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5371726327365128187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbff37f096d3eee42bbcc60548df3c96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.Core.GameBootstrap
+  levelSettings:
+    Seed: 12345
+    CorridorWidth: 8
+    ObstacleRadius: 0.5
+    StartClearZ: -7
+    FirstRowZ: 4
+    RowSpacing: 2.2
+    RowZJitter: 0.8
+    RowCount: 16
+    DoorApproachClearance: 4
+    MinObstaclesPerRow: 3
+    MaxObstaclesPerRow: 8
+    DenseRowChance: 0.5
+    DenseMinSpacingFactor: 2.1
+    SparseMinSpacingFactor: 4
+    DenseCountReduction: 2
+    SparseCountBonus: 2
+    EdgeMarginFactor: 1.2
+    CenterBlockFactor: 1.2
+  balance:
+    BaseBlastRadius: 0.4
+    RadiusPerSize: 1.8
+    ChainRadius: 1.7
+    CriticalMinSize: 0.8
+    MinPlayableSize: 2.5
+    StartSizeBuffer: 1.2
+    ApplyStartSizeBuffer: 1
+  groundWidthMargin: 4
+  groundLengthMargin: 5
+  groundThickness: 0.2
+  playerPrefab: {fileID: 4490234767058918606, guid: f2801a8d0ced2b54ca406a1fc91cc6be, type: 3}
+  obstaclePrefab: {fileID: 3937812057021491575, guid: b51f6ce0fc0536f47a3b60eb869b2478, type: 3}
+  doorPrefab: {fileID: 8583170024659477063, guid: 500afc8ba5b6d1649b4731df5f3c3a5a, type: 3}
+  shotPrefab: {fileID: 7477453035945328331, guid: 129fe54525053e84e849198290888de1, type: 3}
+  groundPrefab: {fileID: 539097763740331520, guid: aaca7799527d557438debc45cd56328d, type: 3}
+  uiManager: {fileID: 0}
+  followCamera: {fileID: 0}

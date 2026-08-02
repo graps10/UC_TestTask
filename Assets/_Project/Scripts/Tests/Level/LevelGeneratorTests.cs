@@ -1,6 +1,7 @@
 using System.Linq;
 using Game.Level;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Game.Tests
 {
@@ -93,32 +94,23 @@ namespace Game.Tests
         }
         
         [Test]
-        public void NoRowHasAGapWiderThanMaxGapFactor()
+        public void EveryRowHasAnObstacleNearCenter()
         {
+            // The player and every shot travel exactly along x=0 — that's the only point in a row that
+            // actually needs to stay blocked. Obstacles elsewhere are free to sit far apart.
             for (int seed = 0; seed < 20; seed++)
             {
                 var settings = DefaultSettings();
                 settings.Seed = seed;
                 var layout = LevelGenerator.Generate(settings);
 
-                float halfWidth = settings.CorridorWidth * 0.5f;
-                float edgeMargin = settings.ObstacleRadius * settings.EdgeMarginFactor;
-                float placeMin = -halfWidth + edgeMargin;
-                float placeMax = halfWidth - edgeMargin;
-                float maxAllowedGap = settings.ObstacleRadius * settings.MaxGapFactor;
+                float centerBlockRadius = settings.ObstacleRadius * settings.CenterBlockFactor;
 
                 foreach (var row in layout.Rows)
                 {
-                    var sortedX = row.ObstacleX.OrderBy(x => x).ToList();
-                    float prev = placeMin;
-                    foreach (var x in sortedX)
-                    {
-                        Assert.LessOrEqual(x - prev, maxAllowedGap + 0.0001f,
-                            $"Seed {seed}, row z={row.Z}: gap before x={x} is walkable.");
-                        prev = x;
-                    }
-                    Assert.LessOrEqual(placeMax - prev, maxAllowedGap + 0.0001f,
-                        $"Seed {seed}, row z={row.Z}: trailing gap to the corridor wall is walkable.");
+                    float distanceToCenter = row.ObstacleX.Min(x => Mathf.Abs(x));
+                    Assert.LessOrEqual(distanceToCenter, centerBlockRadius + 0.0001f,
+                        $"Seed {seed}, row z={row.Z}: nothing blocks the player's centerline path.");
                 }
             }
         }

@@ -2,23 +2,13 @@ using UnityEngine;
 
 namespace Game.Shared
 {
-    // Visual-only primitives (MeshFilter + MeshRenderer, no collider) built from Unity's
-    // built-in meshes.
+    // Visual-only primitive (MeshFilter + MeshRenderer, no collider) built from Unity's built-in
+    // cube mesh. Only PathTrail still needs this — everything else uses hand-authored prefabs.
     public static class RuntimePrimitives
     {
-        public static Transform CreateVisualSphere(string name, Transform parent, Material material)
-        {
-            return CreateVisual(name, parent, material, "Sphere.fbx");
-        }
-
         public static Transform CreateVisualCube(string name, Transform parent, Material material)
         {
             return CreateVisual(name, parent, material, "Cube.fbx");
-        }
-
-        public static Transform CreateVisualCapsule(string name, Transform parent, Material material)
-        {
-            return CreateVisual(name, parent, material, "Capsule.fbx");
         }
 
         private static Transform CreateVisual(string name, Transform parent, Material material, string builtinMeshName)

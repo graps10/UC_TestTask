@@ -5,14 +5,13 @@ namespace Game.CameraControl
     public class FollowCamera : MonoBehaviour
     {
         [Tooltip("Local-space offset from the target (behind and above it).")]
-        [SerializeField] private Vector3 offset = new Vector3(0f, 8f, -8f);
+        [SerializeField] private Vector3 offset = new(0f, 8f, -8f);
 
         [Tooltip("How quickly the camera catches up to the target position (higher = snappier).")]
         [SerializeField] private float followSpeed = 4f;
 
-        [Tooltip("Fixed look angle (pitch/yaw/roll), " +
-                 "matching the isometric reference framing — the camera only translates, it never rotates.")]
-        [SerializeField] private Vector3 fixedEulerAngles = new Vector3(50f, 0f, 0f);
+        [Tooltip("Fixed camera look angle (pitch/yaw/roll) — the camera only translates, it never rotates.")]
+        [SerializeField] private Vector3 fixedEulerAngles = new(50f, 0f, 0f);
 
         private Transform _target;
 

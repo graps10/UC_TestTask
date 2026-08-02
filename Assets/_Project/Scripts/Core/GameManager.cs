@@ -15,10 +15,6 @@ namespace Game.Core
     // Owns game state and rules only
     public class GameManager : MonoBehaviour
     {
-        [Tooltip("Safety margin applied on top of LevelSolver's computed minimum, per the spec's " +
-                 "\"must have a 20% buffer from the start\" requirement. 1.2 = +20%.")]
-        [SerializeField] private float startSizeBuffer = 1.2f;
-
         public GameState State { get; private set; } = GameState.Playing;
         public event Action OnWin;
         public event Action OnLose;
@@ -26,9 +22,8 @@ namespace Game.Core
         private PlayerBall _player;
         private ShotController _shotController;
         private Door _door;
-        
+
         public void Initialize(
-            LevelLayout layout,
             BalanceSettings balance,
             PlayerBall player,
             ShotController shotController,
@@ -38,19 +33,10 @@ namespace Game.Core
             _shotController = shotController;
             _door = door;
 
-            float minRequiredSize = LevelSolver.ComputeMinimumRequiredSize(layout, balance, out bool solvable);
-            if (!solvable)
-            {
-                Debug.LogWarning("GameManager: generated level has no solvable starting size within the search " +
-                                  "range; falling back to the physical ceiling as a best effort.");
-            }
-
-            float startSize = minRequiredSize * startSizeBuffer;
+            float startSize = balance.ApplyStartSizeBuffer
+                ? balance.MinPlayableSize * balance.StartSizeBuffer
+                : balance.MinPlayableSize;
             _player.Initialize(startSize, balance);
-
-            // TEMP diagnostic for the "one tap instantly drains everything" report — remove once resolved.
-            Debug.Log($"[GameManager] startSize={startSize:F2} (minRequired={minRequiredSize:F2}, " +
-                      $"criticalMinSize={balance.CriticalMinSize:F2}, usable budget={startSize - balance.CriticalMinSize:F2})");
 
             _player.OnCriticalSizeReached += HandleLose;
             _door.OnPlayerEntered += HandleWin;
@@ -79,6 +65,7 @@ namespace Game.Core
         private void Freeze()
         {
             _player.SetCanMove(false);
+            _shotController.CancelCharge();
             _shotController.enabled = false;
         }
 

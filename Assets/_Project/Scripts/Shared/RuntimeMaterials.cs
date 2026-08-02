@@ -8,7 +8,7 @@ namespace Game.Shared
     // a new one per object.
     public static class RuntimeMaterials
     {
-        private static readonly Dictionary<Color, Material> Cache = new Dictionary<Color, Material>();
+        private static readonly Dictionary<Color, Material> Cache = new();
 
         public static Material GetOrCreate(Color color)
         {

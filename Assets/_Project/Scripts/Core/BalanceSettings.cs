@@ -6,20 +6,26 @@ namespace Game.Core
     [Serializable]
     public class BalanceSettings
     {
-        [Tooltip("Blast radius of a zero-size shot (a shot always destroys at least the obstacle it hits).")]
-        public float BaseBlastRadius = 0.3f;
+        [Tooltip("Blast radius of a zero-size shot — a shot always destroys at least the obstacle it hits.")]
+        public float BaseBlastRadius = 0.4f;
 
-        [Tooltip("How much blast radius each unit of shot size adds: blastRadius = BaseBlastRadius + shotSize * RadiusPerSize.")]
-        public float RadiusPerSize = 1.0f;
+        [Tooltip("Blast radius added per unit of shot size: blastRadius = BaseBlastRadius + shotSize * RadiusPerSize.")]
+        public float RadiusPerSize = 1.8f;
 
-        [Tooltip("Fixed obstacle-to-obstacle propagation range for the chain reaction, independent of shot size — " +
-                 "this is what makes tightly-packed obstacles chain-destroy from a small hit.")]
-        public float ChainRadius = 1.5f;
+        [Tooltip("Obstacle-to-obstacle chain propagation range, independent of shot size. Keep between " +
+                 "DenseMinSpacingFactor and SparseMinSpacingFactor (x ObstacleRadius) so dense rows chain and sparse ones don't.")]
+        public float ChainRadius = 1.7f;
 
-        [Tooltip("Player size threshold: at or below this, the run is lost (over-held a charge, or spent too much across shots).")]
-        public float CriticalMinSize = 0.4f;
+        [Tooltip("Player size at or below which the run is lost.")]
+        public float CriticalMinSize = 0.2f;
 
-        [Tooltip("Required gap width at a row = currentSize * GapClearanceFactor (safety margin so the ball visibly fits).")]
-        public float GapClearanceFactor = 1.15f;
+        [Tooltip("Smallest player start size that still clears the level (hand-tuned by playtesting).")]
+        public float MinPlayableSize = 0.8f;
+
+        [Tooltip("Multiplier on MinPlayableSize when ApplyStartSizeBuffer is on. 1.2 = the spec's +20% margin.")]
+        public float StartSizeBuffer = 1.2f;
+
+        [Tooltip("Off: start size = MinPlayableSize exactly, for playtesting the true minimum. On: the +20% margin the spec requires.")]
+        public bool ApplyStartSizeBuffer = false;
     }
 }

@@ -10,11 +10,9 @@ namespace Game.Level
         public int Seed = 12345;
 
         [Tooltip("Width of the playable corridor, in units.")]
-        public float CorridorWidth = 6f;
+        public float CorridorWidth = 8f;
 
-        [Tooltip("Radius of a single obstacle, in units. In-game, GameBootstrap overwrites this " +
-                 "from the Obstacle prefab's own CapsuleCollider at startup — editing it here only " +
-                 "matters for calling LevelGenerator/LevelSolver directly (e.g. from tests).")]
+        [Tooltip("Obstacle radius, in units — drives spacing and physics. Overwrites the prefab's own collider radius at spawn.")]
         public float ObstacleRadius = 0.5f;
 
         [Tooltip("Player's spawn Z position.")]
@@ -24,10 +22,13 @@ namespace Game.Level
         public float FirstRowZ = 4f;
 
         [Tooltip("Distance between consecutive obstacle rows, in units.")]
-        public float RowSpacing = 3f;
+        public float RowSpacing = 2.2f;
+
+        [Tooltip("Random +/- Z offset per row on top of RowSpacing, so rows don't read as perfectly even walls.")]
+        public float RowZJitter = 0.6f;
 
         [Tooltip("Number of obstacle rows to generate.")]
-        public int RowCount = 12;
+        public int RowCount = 8;
 
         [Tooltip("Empty gap between the last obstacle row and the door.")]
         public float DoorApproachClearance = 3f;
@@ -36,17 +37,16 @@ namespace Game.Level
         public int MinObstaclesPerRow = 3;
 
         [Tooltip("Maximum obstacles a dense row can have.")]
-        public int MaxObstaclesPerRow = 7;
+        public int MaxObstaclesPerRow = 8;
 
-        [Tooltip("Chance a row is generated as a tightly-packed cluster (chain-reaction showcase) " +
-                 "instead of sparse/spread-out obstacles (single-big-shot showcase).")]
+        [Tooltip("Chance a row is a tightly-packed cluster (chain-reaction showcase) vs. sparse/spread-out (single-shot showcase).")]
         [Range(0f, 1f)]
         public float DenseRowChance = 0.5f;
 
-        [Tooltip("How close together (as a multiple of ObstacleRadius) obstacles in a dense row are allowed to sit.")]
-        public float DenseMinSpacingFactor = 1.6f;
+        [Tooltip("Min spacing in a dense row, as a multiple of ObstacleRadius. Keep >= 2 (touching) to avoid mesh overlap.")]
+        public float DenseMinSpacingFactor = 2.1f;
 
-        [Tooltip("How far apart (as a multiple of ObstacleRadius) obstacles in a sparse row are forced to sit.")]
+        [Tooltip("Min spacing in a sparse row, as a multiple of ObstacleRadius.")]
         public float SparseMinSpacingFactor = 4f;
 
         [Tooltip("Dense rows get up to this many fewer obstacles than MaxObstaclesPerRow at minimum.")]
@@ -55,15 +55,12 @@ namespace Game.Level
         [Tooltip("Sparse rows get up to this many more obstacles than MinObstaclesPerRow at most.")]
         public int SparseCountBonus = 2;
 
-        [Tooltip("Keeps obstacles from spawning flush against the corridor walls, as a multiple of ObstacleRadius.")]
+        [Tooltip("Keeps obstacles off the corridor walls, as a multiple of ObstacleRadius.")]
         public float EdgeMarginFactor = 1.2f;
 
-        [Tooltip("Maximum natural gap allowed between neighbouring obstacles (or a corridor wall) in a " +
-                 "row, as a multiple of ObstacleRadius — a filler obstacle is inserted into any larger " +
-                 "gap. Prevents a row from ever being freely walkable, which would otherwise let " +
-                 "LevelSolver find a degenerate 'shrink to a tiny ball and sneak through unshot' " +
-                 "solution instead of a real one. Keep this comfortably below SparseMinSpacingFactor " +
-                 "or it'll fight the sparse-row spacing and pack every row solid.")]
-        public float MaxGapFactor = 2.5f;
+        [Tooltip("Every row places one guaranteed obstacle within this distance of the centerline (x=0, where " +
+                 "the player and every shot always travel), as a multiple of ObstacleRadius — so every row " +
+                 "blocks the player without forcing the rest of the row together.")]
+        public float CenterBlockFactor = 1.2f;
     }
 }

@@ -11,9 +11,9 @@ namespace Game.Obstacles
                  "so a chain reaction visibly ripples outward instead of popping all at once.")]
         [SerializeField] private float rippleDelayPerUnit = 0.03f;
 
-        private readonly List<Obstacle> _obstacles = new List<Obstacle>();
-        private readonly List<Vector3> _positions = new List<Vector3>();
-        private readonly List<bool> _alive = new List<bool>();
+        private readonly List<Obstacle> _obstacles = new();
+        private readonly List<Vector3> _positions = new();
+        private readonly List<bool> _alive = new();
 
         private BalanceSettings _balance;
         private Obstacle _obstaclePrefab;

@@ -6,7 +6,7 @@ namespace Game.Tests
 {
     public class FollowCameraTests
     {
-        private static readonly Vector3 DefaultOffset = new Vector3(0f, 8f, -8f);
+        private static readonly Vector3 DefaultOffset = new(0f, 8f, -8f);
 
         private GameObject _root;
 

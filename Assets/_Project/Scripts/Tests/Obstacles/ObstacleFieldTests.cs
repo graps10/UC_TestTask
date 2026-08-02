@@ -60,7 +60,6 @@ namespace Game.Tests
                 RadiusPerSize = 1.0f,
                 ChainRadius = 0.5f,
                 CriticalMinSize = 0.2f,
-                GapClearanceFactor = 1.15f,
             };
         }
 

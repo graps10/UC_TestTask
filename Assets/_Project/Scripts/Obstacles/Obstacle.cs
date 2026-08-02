@@ -12,6 +12,15 @@ namespace Game.Obstacles
         [Tooltip("Scale-down animation duration when destroyed, in seconds.")]
         [SerializeField] private float destroyDuration = 0.2f;
 
+        [Tooltip("Color the obstacle flashes to when infected, before it shrinks away.")]
+        [SerializeField] private Color infectedColor = new(0.85f, 0.1f, 0.1f);
+
+        [Tooltip("Duration of the color transition to infectedColor, in seconds.")]
+        [SerializeField] private float infectColorDuration = 0.15f;
+
+        [Tooltip("How long the obstacle stays infected before it starts shrinking away, in seconds.")]
+        [SerializeField] private float infectHoldDuration = 0.1f;
+
         public int Index { get; private set; }
         public bool IsAlive { get; private set; } = true;
 
@@ -45,9 +54,13 @@ namespace Game.Obstacles
             IsAlive = false;
             _collider.enabled = false;
 
+            var renderer = visual != null ? visual.GetComponent<Renderer>() : null;
+            if (renderer != null)
+                renderer.material.DOColor(infectedColor, infectColorDuration).SetDelay(delay);
+
             transform
                 .DOScale(0f, destroyDuration)
-                .SetDelay(delay)
+                .SetDelay(delay + infectHoldDuration)
                 .SetEase(Ease.InBack)
                 .OnComplete(() => Destroy(gameObject));
         }

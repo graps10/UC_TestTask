@@ -49,15 +49,6 @@ namespace Game.Tests
             return (manager, player, shotController, door);
         }
 
-        private static LevelLayout SimpleSolvableLayout()
-        {
-            var layout = new LevelLayout { CorridorWidth = 6f, ObstacleRadius = 0.5f, StartZ = 0f, DoorZ = 10f };
-            var row = new LevelRow(4f);
-            row.ObstacleX.Add(0f);
-            layout.Rows.Add(row);
-            return layout;
-        }
-
         private static BalanceSettings DefaultBalance()
         {
             return new BalanceSettings
@@ -66,28 +57,40 @@ namespace Game.Tests
                 RadiusPerSize = 1.0f,
                 ChainRadius = 1.5f,
                 CriticalMinSize = 0.4f,
-                GapClearanceFactor = 1.15f,
+                MinPlayableSize = 1f,
+                StartSizeBuffer = 1.2f,
+                ApplyStartSizeBuffer = false,
             };
         }
 
         [Test]
-        public void Initialize_AppliesTwentyPercentBufferToPlayerStartSize()
+        public void Initialize_BufferOff_StartsPlayerAtMinPlayableSize()
         {
             var (manager, player, shotController, door) = BuildScene();
-            var layout = SimpleSolvableLayout();
             var balance = DefaultBalance();
 
-            manager.Initialize(layout, balance, player, shotController, door);
+            manager.Initialize(balance, player, shotController, door);
 
-            float expectedMin = LevelSolver.ComputeMinimumRequiredSize(layout, balance, out _);
-            Assert.AreEqual(expectedMin * 1.2f, player.CurrentSize, 0.01f);
+            Assert.AreEqual(balance.MinPlayableSize, player.CurrentSize, 0.01f);
+        }
+
+        [Test]
+        public void Initialize_BufferOn_AppliesStartSizeBufferToPlayerStartSize()
+        {
+            var (manager, player, shotController, door) = BuildScene();
+            var balance = DefaultBalance();
+            balance.ApplyStartSizeBuffer = true;
+
+            manager.Initialize(balance, player, shotController, door);
+
+            Assert.AreEqual(balance.MinPlayableSize * balance.StartSizeBuffer, player.CurrentSize, 0.01f);
         }
 
         [Test]
         public void PlayerReachingCriticalSize_TriggersLose()
         {
             var (manager, player, shotController, door) = BuildScene();
-            manager.Initialize(SimpleSolvableLayout(), DefaultBalance(), player, shotController, door);
+            manager.Initialize(DefaultBalance(), player, shotController, door);
 
             bool loseFired = false;
             manager.OnLose += () => loseFired = true;
@@ -103,7 +106,7 @@ namespace Game.Tests
         public void DoorEntered_TriggersWin()
         {
             var (manager, player, shotController, door) = BuildScene();
-            manager.Initialize(SimpleSolvableLayout(), DefaultBalance(), player, shotController, door);
+            manager.Initialize(DefaultBalance(), player, shotController, door);
 
             bool winFired = false;
             manager.OnWin += () => winFired = true;
@@ -118,7 +121,7 @@ namespace Game.Tests
         public void WinThenLose_OnlyFirstTransitionCounts()
         {
             var (manager, player, shotController, door) = BuildScene();
-            manager.Initialize(SimpleSolvableLayout(), DefaultBalance(), player, shotController, door);
+            manager.Initialize(DefaultBalance(), player, shotController, door);
 
             int winCount = 0, loseCount = 0;
             manager.OnWin += () => winCount++;

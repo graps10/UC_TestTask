@@ -6,7 +6,7 @@ namespace Game.Level
     public class LevelRow
     {
         public readonly float Z;
-        public readonly List<float> ObstacleX = new List<float>();
+        public readonly List<float> ObstacleX = new();
 
         public LevelRow(float z)
         {
@@ -20,6 +20,6 @@ namespace Game.Level
         public float ObstacleRadius;
         public float StartZ;
         public float DoorZ;
-        public readonly List<LevelRow> Rows = new List<LevelRow>();
+        public readonly List<LevelRow> Rows = new();
     }
 }

@@ -16,7 +16,7 @@ namespace Game.Player
         [SerializeField] private float minWidth = 0.01f;
 
         [Tooltip("Trail color.")]
-        [SerializeField] private Color trailColor = new Color(0.95f, 0.35f, 0.55f);
+        [SerializeField] private Color trailColor = new(0.95f, 0.35f, 0.55f);
 
         private PlayerBall _player;
         private float _startZ;

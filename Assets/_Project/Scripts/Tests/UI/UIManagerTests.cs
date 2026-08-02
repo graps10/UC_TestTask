@@ -27,7 +27,7 @@ namespace Game.Tests
                 RadiusPerSize = 1.0f,
                 ChainRadius = 1.5f,
                 CriticalMinSize = 0.4f,
-                GapClearanceFactor = 1.15f,
+                MinPlayableSize = 1f,
             };
         }
 
@@ -67,12 +67,7 @@ namespace Game.Tests
             managerGo.transform.SetParent(_root.transform);
             var manager = managerGo.AddComponent<GameManager>();
 
-            var layout = new LevelLayout { CorridorWidth = 6f, ObstacleRadius = 0.5f, StartZ = 0f, DoorZ = 10f };
-            var row = new LevelRow(4f);
-            row.ObstacleX.Add(0f);
-            layout.Rows.Add(row);
-
-            manager.Initialize(layout, DefaultBalance(), player, shotController, door);
+            manager.Initialize(DefaultBalance(), player, shotController, door);
             
             var uiGo = new GameObject("UIManager");
             uiGo.transform.SetParent(_root.transform);
@@ -109,15 +104,32 @@ namespace Game.Tests
         }
 
         [Test]
-        public void RefreshSizeBar_TracksPlayerSizeRelativeToStart()
+        public void RefreshSizeBar_TracksPlayerSizeRelativeToCriticalRange()
         {
             var (ui, _, player, fill, _, _) = BuildScene();
             float startSize = player.CurrentSize;
+            float criticalMinSize = DefaultBalance().CriticalMinSize;
 
-            player.SetSize(startSize * 0.5f);
+            // Fill must be scaled from CriticalMinSize (empty) to StartSize (full), not
+            // from 0 — otherwise the bar and its color drain at different, mismatched
+            // rates whenever CriticalMinSize is a large fraction of StartSize.
+            float midway = (startSize + criticalMinSize) * 0.5f;
+            player.SetSize(midway);
             ui.RefreshSizeBar();
 
             Assert.AreEqual(0.5f, fill.fillAmount, 0.001f);
+        }
+
+        [Test]
+        public void RefreshSizeBar_ReachesZeroExactlyAtCriticalMinSize()
+        {
+            var (ui, _, player, fill, _, _) = BuildScene();
+            float criticalMinSize = DefaultBalance().CriticalMinSize;
+
+            player.SetSize(criticalMinSize);
+            ui.RefreshSizeBar();
+
+            Assert.AreEqual(0f, fill.fillAmount, 0.001f);
         }
 
         [Test]

@@ -21,9 +21,9 @@ namespace Game.UI
 
         [Header("Size Bar")]
         [Tooltip("Size bar color once the player is safely far from the critical threshold.")]
-        [SerializeField] private Color sizeBarSafeColor = new Color(0.3f, 0.85f, 0.4f);
+        [SerializeField] private Color sizeBarSafeColor = new(0.3f, 0.85f, 0.4f);
         [Tooltip("Size bar color as the player approaches the critical threshold.")]
-        [SerializeField] private Color sizeBarDangerColor = new Color(0.9f, 0.25f, 0.25f);
+        [SerializeField] private Color sizeBarDangerColor = new(0.9f, 0.25f, 0.25f);
 
         [Header("Hint")]
         [Tooltip("Seconds the hint stays fully visible before it starts fading out.")]
@@ -102,13 +102,12 @@ namespace Game.UI
         {
             if (sizeBarFill == null || _player == null)
                 return;
-
-            float startRange = Mathf.Max(0.0001f, _startSize);
-            sizeBarFill.fillAmount = Mathf.Clamp01(_player.CurrentSize / startRange);
-
+            
             float safeRange = Mathf.Max(0.0001f, _startSize - _criticalMinSize);
-            float dangerT = Mathf.Clamp01((_player.CurrentSize - _criticalMinSize) / safeRange);
-            sizeBarFill.color = Color.Lerp(sizeBarDangerColor, sizeBarSafeColor, dangerT);
+            float t = Mathf.Clamp01((_player.CurrentSize - _criticalMinSize) / safeRange);
+
+            sizeBarFill.fillAmount = t;
+            sizeBarFill.color = Color.Lerp(sizeBarDangerColor, sizeBarSafeColor, t);
         }
 
         [ContextMenu("Show Win")]

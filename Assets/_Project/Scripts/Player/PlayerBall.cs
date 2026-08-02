@@ -20,12 +20,13 @@ namespace Game.Player
         [Tooltip("Vertical bob speed while moving.")]
         [SerializeField] private float hopFrequency = 4f;
 
-        [Tooltip("Shrinks the forward-blocking check slightly below the ball's actual " +
-                 "radius so it doesn't snag on obstacles that only just graze its edge.")]
+        [Tooltip("Shrinks the forward-block check below the ball's radius so grazing obstacles don't snag it.")]
         [SerializeField] private float blockCheckMargin = 0.9f;
 
         public float CurrentSize { get; private set; }
         public event Action OnCriticalSizeReached;
+
+        private static readonly Collider[] OverlapBuffer = new Collider[16];
 
         private Rigidbody _rb;
         private SphereCollider _collider;
@@ -97,17 +98,17 @@ namespace Game.Player
 
         private void Update()
         {
-            float bob = Mathf.Abs(Mathf.Sin(Time.time * hopFrequency)) * hopHeight;
+            float bob = _canMove ? Mathf.Abs(Mathf.Sin(Time.time * hopFrequency)) * hopHeight : 0f;
             visual.localPosition = new Vector3(0f, CurrentSize * 0.5f + bob, 0f);
         }
 
         private bool IsBlockedAhead(Vector3 targetPos)
         {
             float checkRadius = CurrentSize * 0.5f * blockCheckMargin;
-            var hits = Physics.OverlapSphere(targetPos, checkRadius);
-            foreach (var hit in hits)
+            int count = Physics.OverlapSphereNonAlloc(targetPos, checkRadius, OverlapBuffer);
+            for (int i = 0; i < count; i++)
             {
-                var obstacle = hit.GetComponent<Obstacle>();
+                var obstacle = OverlapBuffer[i].GetComponent<Obstacle>();
                 if (obstacle != null && obstacle.IsAlive)
                     return true;
             }

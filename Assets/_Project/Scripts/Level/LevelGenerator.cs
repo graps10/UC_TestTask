@@ -5,7 +5,6 @@ namespace Game.Level
     public static class LevelGenerator
     {
         private const int MaxPlacementAttemptsPerObstacle = 30;
-        private const int MaxGapClosePasses = 40;
 
         public static LevelLayout Generate(LevelGenerationSettings settings)
         {
@@ -25,7 +24,8 @@ namespace Game.Level
             float lastRowZ = settings.FirstRowZ;
             for (int i = 0; i < settings.RowCount; i++)
             {
-                float z = settings.FirstRowZ + i * settings.RowSpacing;
+                float jitter = ((float)rng.NextDouble() * 2f - 1f) * settings.RowZJitter;
+                float z = settings.FirstRowZ + i * settings.RowSpacing + jitter;
                 lastRowZ = z;
 
                 bool dense = rng.NextDouble() < settings.DenseRowChance;
@@ -59,7 +59,14 @@ namespace Game.Level
                 ? settings.ObstacleRadius * settings.DenseMinSpacingFactor
                 : settings.ObstacleRadius * settings.SparseMinSpacingFactor;
 
+            // The player and every shot travel exactly along x=0 (no lateral movement), so that's the only
+            // point in the row that actually needs to stay blocked. Placing it first — before any random
+            // obstacle — means the minSpacing check below naturally keeps everything else clear of it,
+            // instead of risking a conflict by patching the center in after the fact.
             var row = new LevelRow(z);
+            float centerBlockRadius = settings.ObstacleRadius * settings.CenterBlockFactor;
+            row.ObstacleX.Add(Mathf.Lerp(-centerBlockRadius, centerBlockRadius, (float)rng.NextDouble()));
+
             for (int o = 0; o < count; o++)
             {
                 for (int attempt = 0; attempt < MaxPlacementAttemptsPerObstacle; attempt++)
@@ -73,49 +80,7 @@ namespace Game.Level
                 }
             }
 
-            CloseOversizedGaps(row, settings, placeMin, placeMax);
-
             return row;
-        }
-        
-        private static void CloseOversizedGaps(LevelRow row, LevelGenerationSettings settings, float placeMin, float placeMax)
-        {
-            float maxGap = settings.ObstacleRadius * settings.MaxGapFactor;
-
-            for (int pass = 0; pass < MaxGapClosePasses; pass++)
-            {
-                row.ObstacleX.Sort();
-
-                float worstGapStart = placeMin;
-                float worstGapEnd = placeMin;
-                float worstGapSize = -1f;
-                float prev = placeMin;
-
-                foreach (var x in row.ObstacleX)
-                {
-                    float gap = x - prev;
-                    if (gap > worstGapSize)
-                    {
-                        worstGapSize = gap;
-                        worstGapStart = prev;
-                        worstGapEnd = x;
-                    }
-                    prev = x;
-                }
-
-                float tailGap = placeMax - prev;
-                if (tailGap > worstGapSize)
-                {
-                    worstGapSize = tailGap;
-                    worstGapStart = prev;
-                    worstGapEnd = placeMax;
-                }
-
-                if (worstGapSize <= maxGap)
-                    return;
-
-                row.ObstacleX.Add((worstGapStart + worstGapEnd) * 0.5f);
-            }
         }
 
         private static bool IsFarEnoughFromExisting(LevelRow row, float x, float minSpacing)

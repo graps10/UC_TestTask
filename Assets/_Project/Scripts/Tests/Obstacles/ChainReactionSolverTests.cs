@@ -23,11 +23,11 @@ namespace Game.Tests
             // Five obstacles spaced 0.3 apart in a line; chainRadius covers each gap.
             var positions = new List<Vector3>
             {
-                new Vector3(0f, 0f, 0f),
-                new Vector3(0.3f, 0f, 0f),
-                new Vector3(0.6f, 0f, 0f),
-                new Vector3(0.9f, 0f, 0f),
-                new Vector3(1.2f, 0f, 0f),
+                new(0f, 0f, 0f),
+                new(0.3f, 0f, 0f),
+                new(0.6f, 0f, 0f),
+                new(0.9f, 0f, 0f),
+                new(1.2f, 0f, 0f),
             };
             var alive = new List<bool> { true, true, true, true, true };
 
@@ -41,9 +41,9 @@ namespace Game.Tests
         {
             var positions = new List<Vector3>
             {
-                new Vector3(0f, 0f, 0f),   // impact
-                new Vector3(0.3f, 0f, 0f), // in blast/chain range
-                new Vector3(10f, 0f, 0f),  // far, isolated
+                new(0f, 0f, 0f),   // impact
+                new(0.3f, 0f, 0f), // in blast/chain range
+                new(10f, 0f, 0f),  // far, isolated
             };
             var alive = new List<bool> { true, true, true };
 
@@ -59,8 +59,8 @@ namespace Game.Tests
         {
             var positions = new List<Vector3>
             {
-                new Vector3(0f, 0f, 0f),
-                new Vector3(5f, 0f, 0f), // isolated, only reachable by a big enough direct blast
+                new(0f, 0f, 0f),
+                new(5f, 0f, 0f), // isolated, only reachable by a big enough direct blast
             };
             var alive = new List<bool> { true, true };
 
@@ -74,7 +74,7 @@ namespace Game.Tests
         [Test]
         public void DeadObstaclesAreIgnored()
         {
-            var positions = new List<Vector3> { Vector3.zero, new Vector3(0.2f, 0f, 0f) };
+            var positions = new List<Vector3> { Vector3.zero, new(0.2f, 0f, 0f) };
             var alive = new List<bool> { true, false };
 
             var destroyed = ChainReactionSolver.Simulate(positions, alive, impactIndex: 0, blastRadius: 1f, chainRadius: 1f);
@@ -86,7 +86,7 @@ namespace Game.Tests
         [Test]
         public void ImpactOnAlreadyDeadObstacle_DestroysNothing()
         {
-            var positions = new List<Vector3> { Vector3.zero, new Vector3(0.2f, 0f, 0f) };
+            var positions = new List<Vector3> { Vector3.zero, new(0.2f, 0f, 0f) };
             var alive = new List<bool> { false, true };
 
             var destroyed = ChainReactionSolver.Simulate(positions, alive, impactIndex: 0, blastRadius: 5f, chainRadius: 5f);
